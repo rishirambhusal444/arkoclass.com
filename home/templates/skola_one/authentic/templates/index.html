@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Bar</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!-- Font Awesome CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <!-- Custom CSS -->
+    <style>
+        .navbar {
+            background-size: cover;
+            text-align: center;
+            position: relative;
+        }
+
+        .navbar-nav {
+            display: flex;
+            align-items: center;
+            flex-grow: 1;
+        }
+
+        .nav-link {
+            color: aliceblue;
+            text-decoration: none;
+        }
+
+        .navbar .nav-link:hover {
+            border: 1px solid hsl(239, 95%, 47%);
+            border-radius: 6px;
+        }
+
+        .nav-item {
+            padding: 0px 10px;
+        }
+
+        .search-container {
+            display: flex;
+            align-items: center;
+            border: 1px solid #ccc;
+            border-radius: 24px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .search-bar {
+            border: none;
+            outline: none;
+            padding: 8px;
+            font-size: 16px;
+            flex-grow: 1;
+            color: rgb(255, 255, 255);
+            background-color: transparent;
+        }
+
+        .search-button {
+            padding: 8px 20px;
+            border-radius: 24px;
+            background-color: transparent;
+            cursor: pointer;
+            color: rgb(255, 255, 255);
+            border: transparent;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+        }
+
+        .profile-img {
+            height: 40px;
+            width: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .profile-container {
+            position: relative;
+        }
+
+        .profile-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            width: 150px;
+            opacity: 0;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            transform: translateY(10px);
+        }
+
+        .profile-menu.show {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .profile-menu-item {
+            border-radius: 8px;
+            display: block;
+            padding: 10px;
+            color: #333;
+            text-decoration: none;
+        }
+
+        .profile-menu-item:hover {
+            background-color: #441f1f;
+            text-decoration: none;
+            border: 1px solid #3672f5;
+        }
+
+        .profile-menu-item:last-child {
+            border-bottom: none;
+        }
+
+        .navbar-collapse {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .navbar-toggler {
+            margin-right: auto; /* Ensure toggler is on the left side */
+        }
+
+        .navbar-brand {
+            margin: 0 auto; /* Center the logo */
+        }
+
+        .profile-container {
+            margin-left: auto; /* Pushes the profile image to the right */
+        }
+
+        .collaps_item {
+            display: none;
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            width: 150px;
+            opacity: 0;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            transform: translateY(10px);
+        }
+
+        .collaps_item.show {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-light">
+    <div class="container-fluid">
+        <!-- Toggler (hamburger) button -->
+        <button class="navbar-toggler" type="button" id="menu-toggler">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        
+        <!-- Navbar content -->
+        <a class="navbar-brand btn nav-link" href="#">Logo</a>
+
+        <div class="collapse navbar-collapse collaps_item" id="navbarTogglerDemo03">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link btn" href="#">Course</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link btn" href="#" tabindex="-1" aria-disabled="true">Vip*</a>
+                </li>
+                <li class="nav-item">
+                    <form class="d-flex nav-item">
+                        <div class="search-container">
+                            <input type="text" id="search-bar" class="search-bar" placeholder="Type to search...">
+                            <button id="search-button" class="search-button"><i class="fas fa-search"></i></button>
+                        </div>
+                    </form>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Profile icon -->
+        <div class="profile-container">
+            {% if user.is_authenticated %}
+                <img src="media/images/logo.jpg" id="profile-img" class="rounded-pill profile-img" alt="User Profile">
+                <div class="profile-menu" id="profile-menu">
+                    <a href="{% url 'logout' %}" class="profile-menu-item">{{ user.username }}</a>
+                    <a href="{% url 'logout' %}" class="profile-menu-item">Logout</a>
+                </div>
+            {% else %}
+                <a href="{% url 'login' %}" class="nav-link">Login</a>
+            {% endif %}
+        </div>
+    </div>
+</nav>
+ <script>
+    document.addEventListener('DOMContentLoaded', function() {
+    const profileContainer = document.getElementById('profile-container');
+    const profileMenu = document.getElementById('profile-menu');
+
+    profileContainer.addEventListener('click', function() {
+        if (profileMenu.style.display === 'none' || profileMenu.style.display === '') {
+            profileMenu.style.display = 'block';
+        } else {
+            profileMenu.style.display = 'none';
+        }
+    });
+
+    // Optional: Hide the menu when clicking outside of it
+    document.addEventListener('click', function(event) {
+        if (!profileContainer.contains(event.target)) {
+            profileMenu.style.display = 'none';
+        }
+    });
+});
+
+ </script>
+</body>
+</html>

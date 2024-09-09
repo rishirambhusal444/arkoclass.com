@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}Article List{% endblock %}
+{% block content %}
+
+    <div class="row">
+        <div class="card-container">
+            <div class="card ">
+                    <div class="h3 text-center bg-light">
+                        {{ article.title }}
+                    </div>
+                    <div class="mx-3">
+                        <div>{{ article.content|safe }}</div>
+                    </div>
+    </div>
+</div>
+</div>
+
+
+
+<hr>
+<hr>
+        <button> <a href="{% url 'create_article' %}">create_article</a></button>
+        {% for article in articles %}
+        <!-- <div class="col-md-4 mb-4"> -->
+            <div class="card-container border border-dark">
+                <div class="card-body bg-dark">
+                    <div class="row"> <div class="col-md-1">{{ article.id }}</div>
+                        <div class="col-md-2 ">
+                            <div class="card summary_profile_image"> PHOTO</div>
+                            <!-- <img src="{{ article.image.url }}" alt="Article Image" class="img-fluid"> -->
+                        </div>
+                        <div class="col-md-9 ">
+                            <h7 class="card-title summary_title ">{{ article.title }}</h7>
+                            <p class="card-text summary_text">{{ article.summary }}</p>
+                            <p class="card-text summary_text">{{ article.content }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        <!-- </div> -->
+        {% endfor %}
+    </div>
+</div>
+
+
+
+</head>
+<body>
+
+
+{% endblock %}

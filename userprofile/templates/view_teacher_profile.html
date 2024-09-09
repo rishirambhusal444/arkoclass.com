@@ -1,0 +1,267 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="photo">
+                <div class="cover-photo">
+                    {% if teacher.cover_image %}
+                        <img src="{{ teacher.cover_image.url }}" alt="Cover Image" class="img-fluid cover-image">
+                    {% else %}
+                        <p>No cover image available</p>
+                    {% endif %}
+                </div>
+                <div class="profile-photo">
+                    {% if teacher.profile_img %}
+                        <img src="{{ teacher.profile_img.url }}" alt="Profile Image" class="img-fluid">
+                    {% else %}
+                        <p>No profile image available</p>
+                    {% endif %}
+                </div>
+                <div type="button" class="heart"><a href="#"><i class="fas fa-heart"></i></a></div>
+                <div class="username">
+                    <a href="#">{{ teacher.user.first_name }} {{ teacher.user.last_name }}</a> || {{ teacher.major_subject }} || {{ teacher.description }}
+                </div>
+            </div>
+        </div>
+  
+
+    <div class="row mt-5">
+        <h4 class="btn btn-danger"> videos of <b>{{ teacher.user.first_name }} {{ teacher.user.last_name }}</b> list displayed below</h4>
+    </div>
+    <hr>
+ {% if messages %}
+ {% for message in messages %}
+     <div class="alert alert-{{ message.tags }}">
+         {{ message }}
+     </div>
+ {% endfor %}
+{% endif %}
+<hr>
+  {% for subject, videos in videos_by_subject.items %}
+    <div class="row mb-3">
+      <div class="col-12">
+        <button type="button" class="btn btn-secondary">
+            {{ subject.faculty.faculty_name }} / {{ subject.level.level_name }} / {{ subject.subject_name }}
+
+        </button>
+        {% if teacher.usre.id != user.id %}
+        <a href="{% url 'vip_section:vip_form' subject.id %}" style="color:#ffffff; text-decoration:none; width:100%;">     
+            <button type="button" class="btn btn-success">Buy</button>
+        </a>
+        {% endif %}
+        <span><i class="fas fa-eye"></i> 1000</span>
+      </div>
+    </div>
+    <div class="row mb-4">
+        <div class="horizontal-scroll-container d-flex flex-nowrap overflow-auto">
+            {% for video in videos %}
+            <div class="col-sm-6 col-md-4 col-lg-3 mb-3 flex-shrink-0 p-2">
+                <a href="{% url 'video_player' video.id %}" class="card h-100">
+                    <div class="thumbnil_container">
+                        <i class="fas fa-play thumbnil_paly"></i>
+                        <img src="{{ video.thumbnil.url }}" alt="Profile Image" class="img-fluid">
+                    </div>
+                    <div class="card-footer h-100">
+                        <p><b>{{ video.video_name }}</b> {{ video.description }}</p>
+                    </div>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+  {% endfor %}
+    <!-- The Modal -->
+    <div class="modal" id="myModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <!-- Modal Header -->
+                <div class="modal-header">
+                    <h4 class="modal-title">Change Your Details</h4>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <!-- Modal Body -->
+                <div class="modal-body">
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text btn btn-outline-secondary" id="basic-addon3">Name</span>
+                        </div>
+                        <input type="text" class="form-control btn-outline-primary" id="basic-url" aria-describedby="basic-addon3">
+                        <div class="input-group-append">
+                            <button class="btn btn-outline-primary" type="button"><i class="fas fa-check"></i></button>
+                        </div>
+                    </div>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text btn btn-outline-secondary" id="basic-addon3">About</span>
+                        </div>
+                        <input type="text" class="form-control btn-outline-primary" id="basic-url" aria-describedby="basic-addon3">
+                        <div class="input-group-append">
+                            <button class="btn btn-outline-primary" type="button"><i class="fas fa-check"></i></button>
+                        </div>
+                    </div>
+                </div>
+                <!-- Modal Footer -->
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <style>
+
+        .thumbnil_paly{
+            font-size: 60px;
+            color:red;
+            position: absolute;
+            margin: 30% 40%;
+            text-shadow: #0526e0;           
+        }
+        .thumbnil_container{
+      border: 3px solid rgba(218, 27, 36, 0.595);
+      box-shadow: 0 0 10px rgb(158, 156, 156);
+
+        }
+
+        .photo{
+            position: relative;
+            width: 100%;
+            height: 350px;
+        }
+        .cover-photo {
+            width: 100%;
+            height: 350px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .cover-photo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Ensures the image covers the div */
+            object-position: center; /* Centers the image within the div */
+        }
+        .profile-photo {
+            position: absolute;
+            width: 150px;
+            height: 150px;
+            border: 5px solid white;
+            border-radius: 50%;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+            bottom: 0px;
+        }
+        .profile-photo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .username {
+            position: absolute;
+            width: 100%;
+            height: 36px;
+            bottom: 2%;
+            background-color: rgb(230, 227, 227);
+        }
+        .username a {
+            text-decoration: none;
+            color: black;
+            font-weight: bold;
+            font-size: 20px;
+            margin: 2%;
+            text-shadow: 0 0 10px rgba(0, 38, 255, 0.986);
+        }
+        .username a:hover {
+            color: rgb(17, 0, 255);
+        }
+        
+        .heart {
+            position: absolute;
+            width: 100%;
+            height: 22%;
+            bottom: 10%;
+        }
+        .fa-heart {
+            
+            color: rgb(240, 0, 0);
+            font-size: 40px;
+            float: right;
+            margin-right:2%;
+            
+        }
+        .profile-footer {
+            position: relative;
+            background-color: #dfdfdf;
+            /* bottom: 40px; */
+        }
+        .profile-footer .bton {
+            border-top: 1px solid transparent;
+            flex-wrap: wrap;
+            gap: 1px;
+        }
+        .profile-footer .p_btn {
+            font-size: 16px;
+            height: 40px;
+            width: 120px;
+            text-decoration: none;
+            border-radius: 6px;
+            border: 2px solid transparent;
+            text-align: center;
+            margin-left: 3px;
+        }
+        .profile-footer .p_btn a {
+            color: black;
+            text-decoration: none;
+        }
+        .profile-footer .p_btn:hover {
+            border: 2px solid rgb(134, 188, 231);
+        } */
+        .card-body {
+            position: relative;
+        }
+        .button-group button {
+            margin: 0 5px;
+        }
+        .profile-footer .bton .more {
+            display: none;
+        }
+        .more_menu {
+            display: none;
+        }
+        .edit_menu {
+            display: none;
+        }
+        @media (max-width: 1000px) {
+
+            .profile-footer .bton .more {
+                position: relative;
+                display: inline-block;
+            }
+            .hide_for_mobile {
+                display: none;
+            }
+        }
+    </style>
+   
+    <!-- JavaScript -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const more = document.getElementById('more');
+            const more_menu = document.getElementById('more_menu');
+            more.addEventListener('click', function() {
+                if (more_menu.style.display === 'none' || more_menu.style.display === '') {
+                    more_menu.style.display = 'flex';
+                } else {
+                    more_menu.style.display = 'none';
+                }
+            });
+            document.addEventListener('click', function(event) {
+                if (!more_menu.contains(event.target) && event.target !== more) {
+                    more_menu.style.display = 'none';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
+{% endblock %}

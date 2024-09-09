@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js" integrity="sha384-oBqDVmMz4fnFO9gybBogGzK35sI5ID1GTXA/1E0F5ZgpztSnNr5O6mzOa0ck0yFi" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
+
+{% load static %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
+
+<style>
+    .inline-group {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+    .inline-group input.form-control {
+        margin-right: 10px;
+        width: auto;
+        flex-grow: 1;
+        display: inline-block;
+    }
+    .inline-group button {
+        display: inline-block;
+    }
+   
+
+   
+    #video-preview {
+        position: relative;
+        width: 100%;
+    }
+    #cancel-video-button {
+        position: absolute;
+        top: 0px;
+        right: 0px;
+    }
+    .select-center {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+.preview-container {
+position: relative;
+display: inline-block;
+}
+
+.preview-container button {
+    position: absolute;
+    top: 0px;
+    right: 5px;
+    z-index: 10;
+}
+
+.preview-container img,
+.preview-container video {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+</style>
+
+</head>
+<body>
+    <div class="container">
+        
+
+        <div class="row">
+            <div class="col-12">
+                <!-- Refresh Button with Direct Link -->
+                <a href="" class="btn btn-outline-secondary" id="refresh_FLS_btn" style="float: right; margin-right: 10px;"> <i class="fas fa-refresh"></i>
+                </a>
+        
+                <!-- Create New Button -->
+                <div class="btn btn-outline-primary" id="create_FLS_btn" style="float: right; margin-right: 10px;">
+                    Create New
+                </div>
+        
+                <!-- Select Existing Button -->
+                <div class="btn btn-outline-primary" id="select_FLS_btn" style="display: none; float: right;">
+                    Select Existing
+                </div>
+            </div>
+        </div>
+        
+        
+<!-- selection of FLS start -->
+
+            <div class="row " style="height: 70px;" id="select_FLS_form" >
+
+                <div class="form-group col-md-4">
+                    <strong> Faculty Name :</strong>
+                    <div class="input-group mb-3 select-center">
+                        <select id="facultySelect" name="faculty_name" class="form-control" required>
+                            <option value="">⮟ Select Faculty Name ⮟</option>
+                            {% for related_faculty in related_faculties %}
+                                <option value="{{ related_faculty.faculty.id }}">{{ related_faculty.faculty.faculty_name }}</option>
+                            {% endfor %}
+                        </select>
+                   
+                    </div>
+                </div>
+                <div class="form-group col-md-4">
+                    <strong> Class/Level Name :</strong>
+                    <div class="input-group mb-3 select-center" id="levelSelect_container">
+                        <select id="levelSelect" name="level_name" class="form-control" required>
+                            <option value="">⮟ Select Level/Semester/Class ⮟</option>
+                            {% for level in levels %}
+                                <option value="{{ level.id }}">{{ level.level_name }}</option>
+                            {% endfor %}
+                        </select>
+                        <div class="input-group-append">
+                            <button type="button" id="level_plus_btn" class="btn btn-secondary"><i class="fa fa-plus"></i></button>
+                        </div>
+                    </div>
+                    <div id="new_level_form" class="form-group inline-group" style="display: none;">
+                        <span id="level-error" style="color: red; display: none;"></span>
+                        <input type="text" id="new_level_input_text" class="form-control">
+                        <button type="button" id="create-level-button" class="btn btn-secondary">Create</button>
+                    </div>
+
+                </div>
+                <div class="form-group col-md-4" >
+                    <strong> Subjec Name :</strong>
+                    <div class="input-group mb-3 select-center" id="subjectSelect_container">
+                        <select id="subjectSelect" name="subject_name" class="form-control" required>
+                            <option value="">⮟ Select Subject ⮟</option>
+                            {% for subject in subjects %}
+                                <option value="{{ subject.subject_name }}">{{ subject.subject_name }}</option>
+                            {% endfor %}
+                        </select>
+                        <div class="input-group-append">
+                            <button type="button" id="subject_plus_btn" class="btn btn-secondary"><i class="fa fa-plus"></i></button>
+                        </div>
+                    </div>
+                    <div id="new-subject-form" class="form-group inline-group" style="display: none;">
+                        <span id="subject_error" style="color: red; display: none;"></span>
+                        <input type="text" id="new_subject_input_text" class="form-control">
+                        <button type="button" id="create-subject-button" class="btn btn-secondary">Create</button>
+                    </div>
+                </div>            
+            </div>
+<!-- selection of FLS ended -->
+
+<!-- create of FLS start -->
+        <div class="row " id="create_FLS_form" style="display: none; height: 70px;" >
+            <div class="form-group col-md-4">
+                <label for=""> <strong> Faculty Name :</strong></label>
+                <div id="new-faculty-form" class="form-group inline-group">
+                    <input type="text" id="new-faculty-create" name="faculty_name" class="form-control" placeholder="Enter Faculty name"required>
+                </div>
+            </div>
+            <div class="form-group col-md-4">
+                <label for=""> <strong> Class/Level Name :</strong></label>
+                <div id="" class="form-group inline-group">
+                    <input type="text" id="new-level-create" name="level_name" class="form-control" placeholder="Enter Level/Semester"required>
+                </div>
+            </div>
+            <div class="form-group col-md-4">
+                <label for=""> <strong> Subjec Name :</strong></label>
+                <div id="" class="form-group inline-group">
+                    <input type="text" id="new-subject-create" name="subject_name" class="form-control" placeholder="Enter Subject name"required>
+                </div>
+            </div>   
+        </div>
+<!-- create of FLS ending -->
+
+ {% if messages %}
+ {% for message in messages %}
+     <div class="alert alert-{{ message.tags }}">
+         {{ message }}
+     </div>
+ {% endfor %}
+ 
+{% endif %}
+{% if saved == 'saved' %}
+<p>Data was successfully saved!</p>
+{% elif saved == 'not_saved' %}
+<p>Data was not saved due to an error.</p>
+{% endif %}
+        <!-- this is for show and hide row for faculty create -->
+       
+
+        <div class="row mt-4">
+            <form id="videoForm" method="post" enctype="multipart/form-data" action="{% url 'create_video_form' %}">
+                {% csrf_token %}
+                    
+                <div class="row" style="display: none;">
+                        <input type="text" name="faculty_name" id="newFaculty" value=""  disabled>
+                        <input type="text" name="level_name" id="newLevel" value=""  disabled>
+                        <input type="text" name="subject_name" id="newSubject" value=""  disabled>
+
+                        <input type="text" name="price" id="price" value="1000" disabled>
+                        <input type="text" name="discount" id="discount" value="100" disabled>
+                        <input type="text" name="offer_time" id="offer_time" value="365" disabled>
+                    </div>
+                <div class="row">
+                    <!-- <input type="text" id="subject_id" name="subject_id"> -->
+                    <div class="col-md-4 ">
+                            <label for="chapter-number"> <strong> Enter  chapter-details:</strong></label>
+                        <div class="input-group mb-3  border-outline-dark">
+                            <input type="text" id="chapter-number" name="chapter_number" class="form-control" placeholder="Chapter number" required>
+                            <input type="text" id="video-name" name="video_name" class="form-control" placeholder="Write video name" required>
+                        </div>
+                    </div>
+                    <!-- this is video and thumbnil section   -->
+                    <div class="col-md-4">
+                        <label for="video"><strong>Insert video and thumbnail:</strong></label>
+                        <div class="row m-1" >
+                            <!-- Video Upload Button -->
+                            <div class="col-6 btn btn-outline-dark" id="video-upload-button">
+                                <i class="fas fa-video"></i><br><strong>Insert Video</strong> 
+                                <input type="file" class="custom-file-input" id="video-upload" name="video" accept="video/*" style="display: none;" required>
+                            </div>
+                            <!-- Thumbnail Upload Button -->
+                            <div class="col-6 btn btn-outline-dark" id="thumbnil-upload-button">
+                                <i class="fas fa-image"></i><br><strong>Insert Thumbnail</strong> 
+                                <input type="file" class="custom-file-input" id="thumbnil-upload" name="thumbnil" accept="image/*" style="display: none;" required>
+                            </div>
+                        </div>
+                        <!-- Video Preview -->
+                         <div class="row">
+                            <div class="col-6">
+                                <div id="video-preview" class="mt-2 preview-container"></div>
+                            </div>
+                            <div class="col-6">
+                                <div id="thumbnil-preview" class="mt-2 preview-container"></div>
+                            </div>
+                         </div>
+                        <!-- Thumbnail Preview -->
+                    </div>
+                          
+
+                    <div class="col-md-4">
+                        <label for="chapter-number"> <strong> About video:</strong></label>
+                        <div class="input-group mb-3 ">
+                            <textarea name="description" id="description" class="form-control" placeholder="Write about video #math, #physics" rows="3" style="resize: none;" required></textarea>
+                        </div>
+                    </div>
+                </div>
+        
+                <div class="form-group row">
+                    <div class="col-12">
+                        <div class="card w-100">
+                            <button type="button" id="form-error-button" class="btn btn-warning" style="float: right; display: none;">
+                                <!-- The error message will be injected here -->
+                            </button>
+                        </div>
+        
+                        <button type="submit" id="submit-button" class="btn btn-primary" style="float: right;">Submit</button>
+                </div>
+            </div>
+            </form>
+          </div>
+  
+
+    <hr>
+
+    <!-- Video List -->
+    <h2 class="mt-5">Video List</h2>
+    <table class="table table-striped mt-3">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Subject</th>
+                <th>Chapter Number</th>
+                <th>Video Name</th>
+                <th>Description</th>
+                <th>Video File</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for video in videos %}
+                <tr>
+                    <td>{{ video.id }}</td>
+                    <td>{{ video.subject.subject_name }}</td>
+                    <td>{{ video.chapter_number }}</td>
+                    <td>{{ video.video_name }}</td>
+                    <td>{{ video.description }}</td>
+                    <td><a href="{{ video.video.url }}">Download</a></td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<script>
+
+    
+    document.addEventListener("DOMContentLoaded", function() {
+    const videoUploadInput = document.getElementById("video-upload");
+    const thumbnilInput = document.getElementById("thumbnil-upload");
+    const videoUploadButton = document.getElementById("video-upload-button");
+    const thumbnilUploadButton = document.getElementById("thumbnil-upload-button");
+
+    const videoPreviewDiv = document.getElementById("video-preview");
+    const thumbnilPreviewDiv = document.getElementById("thumbnil-preview");
+
+    // Trigger file input when video upload button is clicked
+    videoUploadButton.addEventListener("click", function() {
+        videoUploadInput.click();
+    });
+    
+    thumbnilUploadButton.addEventListener("click", function() {
+        thumbnilInput.click();
+    });
+
+    // Show video preview and add cancel button
+    videoUploadInput.addEventListener("change", function() {
+        const file = videoUploadInput.files[0];
+        if (file) {
+            videoUploadButton.style.display = 'none'; // Hide the upload button
+            const video = document.createElement("video");
+            video.src = URL.createObjectURL(file) ;
+            video.controls = true; // Show video controls
+            video.classList.add("w-100");
+         
+
+            const cancelButton = document.createElement("button");
+            cancelButton.id = "cancel-video-button";
+            cancelButton.className = "btn btn-outline-danger";
+            cancelButton.innerText = "X";
+            cancelButton.onclick = function() {
+                videoUploadInput.value = ''; // Clear the input value
+                videoPreviewDiv.innerHTML = ''; // Clear the preview
+                videoUploadButton.style.display = 'block'; // Show the upload button again
+            };
+
+            videoPreviewDiv.innerHTML = '';
+            videoPreviewDiv.appendChild(video);
+            videoPreviewDiv.appendChild(cancelButton);
+        } else {
+            videoPreviewDiv.innerHTML = '';
+        }
+    });
+       
+    // Show thumbnail preview and add cancel button
+    thumbnilInput.addEventListener("change", function() {
+        const file = thumbnilInput.files[0];
+        if (file) {
+            thumbnilUploadButton.style.display = 'none'; // Hide the upload button
+            const image = document.createElement("img");
+            image.src = URL.createObjectURL(file);
+            image.classList.add("w-100");
+
+            const cancelButton = document.createElement("button");
+            cancelButton.id = "cancel-thumbnil-button";
+            cancelButton.className = "btn btn-outline-danger top-0 end-0";
+            cancelButton.innerText = "X";
+            cancelButton.onclick = function() {
+                thumbnilInput.value = ''; // Clear the input value
+                thumbnilPreviewDiv.innerHTML = ''; // Clear the preview
+                thumbnilUploadButton.style.display = 'block'; // Show the upload button again
+            };
+
+            thumbnilPreviewDiv.innerHTML = '';
+            thumbnilPreviewDiv.appendChild(image);
+            thumbnilPreviewDiv.appendChild(cancelButton);
+        } else {
+            thumbnilPreviewDiv.innerHTML = '';
+        }
+    });
+});
+
+
+    document.addEventListener('DOMContentLoaded', function() {
+
+    const facultySelect = document.getElementById('facultySelect');
+    const levelSelect = document.getElementById('levelSelect');
+    const subjectSelect = document.getElementById('subjectSelect');
+
+    const new_faculty_create = document.getElementById('new-faculty-create');
+    const new_level_create = document.getElementById('new-level-create');
+    const new_subject_create = document.getElementById('new-subject-create');
+
+    const level_plus_btn = document.getElementById("level_plus_btn");
+    const new_level_form = document.getElementById("new_level_form");
+    const new_level_name_input = document.getElementById("new_level_input_text");
+    const create_level_button = document.getElementById("create-level-button");
+    const level_error = document.getElementById("level-error");
+    const levelSelect_container = document.getElementById("levelSelect_container");
+
+    const newFaculty = document.getElementById('newFaculty');
+    const newLevel = document.getElementById('newLevel');
+    const newSubject = document.getElementById('newSubject');
+    
+    const selectedFacultyName = document.getElementById('selectedFacultyName');
+    const Create_class_Button = document.getElementById('create-class');
+
+    const subject_plus_btn = document.getElementById('subject_plus_btn');
+    const new_subject_form = document.getElementById("new-subject-form");
+    const new_subject_name_input = document.getElementById("new_subject_input_text");
+    const create_subject_button = document.getElementById("create-subject-button");
+    const subjectSelect_container = document.getElementById("subjectSelect_container");
+
+    const select_FLS_btn = document.getElementById("select_FLS_btn");
+    const create_FLS_btn = document.getElementById("create_FLS_btn");
+
+    const create_FLS_form = document.getElementById("create_FLS_form");
+    const select_FLS_form = document.getElementById("select_FLS_form");
+
+
+
+ select_FLS_btn.addEventListener("click", function() {
+            select_FLS_btn.style.display = 'none';
+            create_FLS_btn.style.display = 'block';
+            select_FLS_form.style.display = 'flex';
+            create_FLS_form.style.display = 'none';
+        });
+ create_FLS_btn.addEventListener("click", function() {
+            select_FLS_btn.style.display = 'block';
+            create_FLS_btn.style.display = 'none';
+            create_FLS_form.style.display = 'flex';
+            select_FLS_form.style.display = 'none';
+
+  document.getElementById('submit-button').addEventListener('click', function(event) {
+    // Get the form container
+        const formContainer = document.getElementById('create_FLS_form');
+
+    // If the form is visible, load the IDs and perform validation
+    const newFaculty_create = document.getElementById('new-faculty-create');
+    const newLevel_create = document.getElementById('new-level-create');
+    const newSubject_create = document.getElementById('new-subject-create');
+
+    const isFacultyValid = validateField(newFaculty_create, 'faculty name');
+    const isLevelValid = validateField(newLevel_create, 'level name');
+    const isSubjectValid = validateField(newSubject_create, 'subject name');
+
+
+    // Proceed with validation or any other logic needed
+    function validateField(field, fieldName) {
+        const value = field.value.trim();
+        const regex = /^[a-zA-Z]{4,16}$/;
+
+        if (regex.test(value)) {
+            field.style.borderColor = 'green';
+            return true;
+        } else {
+            field.style.borderColor = 'red';
+
+            // Show error message in the button
+            const errorButton = document.getElementById('form-error-button');
+            errorButton.textContent = `Invalid ${fieldName}: Should be 4-16 characters, contain only letters, and no special characters.`;
+            errorButton.style.display = 'inline-block'; // Make the button visible
+
+            return false;
+        }
+    }
+
+ 
+    if (!isFacultyValid || !isLevelValid || !isSubjectValid) {
+        event.preventDefault(); // Prevent form submission if any field is invalid
+    } else {
+        // Hide the error button if no error exists
+        document.getElementById('form-error-button').style.display = 'none';
+    }
+});
+
+});
+    
+
+
+
+    const videoUploadInput = document.getElementById('video-upload');
+    const thumbnilInput = document.getElementById('thumbnil');
+
+    const isVideoValid = valid_video(videoUploadInput, 'level name');
+    const isThumbnilValid = valid_video(thumbnilInput, 'subject name');
+
+
+
+    // Proceed with validation or any other logic needed
+    function valid_video(field, fieldName) {
+        if(field.length>=0){
+        fieldName.style.borderColor = 'green';
+            return true;
+        } else {
+            field.style.borderColor = 'red';
+
+            // Show error message in the button
+            const errorButton = document.getElementById('form-error-button');
+            errorButton.textContent = `Invalid ${fieldName}: Should be 4-16 characters, contain only letters, and no special characters.`;
+            errorButton.style.display = 'inline-block'; // Make the button visible
+
+            return false;
+        }
+    }
+
+ 
+    if (!isVideoValid || !isThumbnilValid ) {
+        event.preventDefault(); // Prevent form submission if any field is invalid
+    } else {
+        // Hide the error button if no error exists
+        document.getElementById('form-error-button').style.display = 'none';
+    }
+});
+
+
+    new_faculty_create.addEventListener('input',function(){
+        newFaculty.value=this.value;
+    });
+    new_level_create.addEventListener('input',function(){
+        newLevel.value=this.value;
+    });
+    new_subject_create.addEventListener('input',function(){
+        newSubject.value=this.value;
+    });
+
+
+    facultySelect.addEventListener('change', function(event) {
+        const selectedFacultyId = event.target.value;
+        newFaculty.value=selectedFacultyId;
+        fetchLevels(selectedFacultyId);
+    });
+
+    subjectSelect.addEventListener('change', function(event) {
+        const selectedSubjectId = subjectSelect.options[subjectSelect.selectedIndex].dataset.id;
+        newSubject.value=selectedSubjectId
+    });
+
+    
+    subjectSelect.addEventListener('change', function(event) {
+        const selectedSubjectId = subjectSelect.options[subjectSelect.selectedIndex].dataset.id;
+        newSubject.value=selectedSubjectId
+    });
+
+    levelSelect.addEventListener('change', function(event) {
+        const selectedLevelId = levelSelect.options[levelSelect.selectedIndex].dataset.id;     
+        fetchSubjects(selectedLevelId);
+        newLevel.value=selectedLevelId
+    });
+
+  
+
+
+
+    async function fetchLevels(facultyId) {
+        try {
+            const response = await fetch(`/videos/get_levels/?facultyId=${facultyId}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch levels');
+            }
+            const data = await response.json();
+   
+            // Clear existing options
+            levelSelect.innerHTML = '';
+            
+            // Add default option
+            levelSelect.appendChild(new Option('Select Level/Semester/Class', ''));
+            
+            // Populate levels
+            data.levels.forEach(level => {
+                const option = new Option(level.level_name, level.id);
+                option.dataset.id = level.id; // Store the id in a data attribute
+                levelSelect.appendChild(option);
+            });
+        } catch (error) {
+            console.error('Error fetching levels:', error.message);
+        }
+    }
+
+    async function fetchSubjects(levelId) {
+        try {
+            const response = await fetch(`/videos/get_subjects/?levelId=${levelId}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch subjects');
+
+            }
+            const data = await response.json();
+    
+            // Clear existing options
+            subjectSelect.innerHTML = '';
+            
+            // Add default option
+            subjectSelect.appendChild(new Option('Select Subject', ''));
+            
+            // Populate subjects
+            data.subjects.forEach(subject => {
+                const option = new Option(subject.subject_name, subject.id);
+                option.dataset.id = subject.id; // Store the id in a data attribute
+                subjectSelect.appendChild(option);
+            });
+        } catch (error) {
+            console.error('Error fetching subjects:', error.message);
+        }
+         // Show the select button when a subject is selected
+            subjectSelect.addEventListener('change', function() {
+                if (subjectSelect.value) {
+                    selected_FLS.style.display = 'block';
+                    Create_class_Button.style.display = 'none';
+                    // this is for redering the selected subject :
+
+        const selectedFacultyName = facultySelect.options[facultySelect.selectedIndex].text;
+        const selectedLevelName = levelSelect.options[levelSelect.selectedIndex].text;
+        const selectedSubjectName = subjectSelect.options[subjectSelect.selectedIndex].text;
+        selected_FLS.textContent = `Select: ${selectedFacultyName} / ${selectedLevelName} / ${selectedSubjectName}`;
+
+
+                } else {
+                    selected_FLS.style.display = 'none';
+                }
+            });
+
+            // Hide the select button when the "Add New Subject" button is clicked
+                 subject_plus_btn.addEventListener('click', function() {
+                selected_FLS.style.display = 'none';
+                Create_class_Button.style.display = 'block';
+
+                
+                // toggleNewForm('', 'new-subject-form')
+
+            });
+            
+    }
+
+    
+    level_plus_btn.addEventListener("click", function() {
+        level_plus_btn.style.display = 'none';
+        levelSelect_container.style.display = 'none';
+        subjectSelect_container.style.display = 'none';
+
+        new_level_form.style.display = 'block';
+        new_subject_form.style.display = 'block';
+
+        newLevel.value ='';
+        newSubject.value ='';
+        selected_FLS.style.display = 'none';
+        Create_class_Button.style.display = 'flex';
+    });
+  
+    subject_plus_btn.addEventListener("click", function() {
+            subject_plus_btn.style.display = 'none';
+            new_subject_form.style.display = 'flex';
+            subjectSelect_container.style.display = 'none';
+
+
+
+     });         
+
+
+    create_level_button.addEventListener("click", function() {
+        const new_level_name = new_level_name_input.value.trim();
+        const regex = /^[a-zA-Z]{4,16}$/;
+
+
+        if (!isNaN(new_level_name) || !regex.test(new_level_name)) {
+            level_error.textContent = "Level name should be a non-empty string/ not allow of special charector.";
+            level_error.style.display = 'block';
+            new_level_name_input.value = '';
+            return false;
+        } else if (new_level_name) {
+            const level_dropdown = document.getElementById("levelSelect");
+            const option = document.createElement("option");
+            option.value = new_level_name;
+            option.text = new_level_name;
+            level_dropdown.add(option);
+            level_dropdown.value = new_level_name;
+            newLevel.value=new_level_name  // this is sending newly created value or level to input fild
+            new_level_name_input.value = '';
+
+            new_level_form.style.display = 'none';
+            level_plus_btn.style.display = 'inline-block';
+            level_error.style.display = 'none';
+            levelSelect_container.style.display = 'flex';
+
+
+        }
+        selected_FLS.style.display = 'none';
+        Create_class_Button.style.display = 'flex';
+    });
+      
+            // Event listener for creating new faculty
+            create_subject_button.addEventListener("click", function() {
+                const new_subject_name = new_subject_name_input.value.trim();
+                const regex = /^[a-zA-Z]{4,16}$/;
+
+        if (!isNaN(new_subject_name) || !regex.test(new_subject_name)) {
+            subject_error.textContent = "Level name should be a non-empty string/ not allow of special charector.";
+                    subject_error.style.display = 'block'; // Show the error message
+                    new_subject_name.value = '';
+
+                    return false;
+                    }
+                else if (new_subject_name) {
+
+                    // Handle creating new faculty without using an API
+                    const subject_dropdown = document.getElementById("subjectSelect");
+                    const option = document.createElement("option");
+                    option.value = new_subject_name; // This should be the ID from the database in a real scenario
+                    option.text = new_subject_name;
+                    subject_dropdown.add(option);
+                    subject_dropdown.value = new_subject_name;
+
+                    // Clear the new faculty form
+                    newSubject.value=new_subject_name;
+                    new_subject_name_input.value = '';
+                    new_subject_form.style.display = 'none';
+                    subject_plus_btn.style.display = 'flex';
+                    subjectSelect_container.style.display = 'flex';
+
+                }
+
+            });
+
+
+
+
+});
+
+</script>
+
+</body>
+</html>

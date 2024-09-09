@@ -1,0 +1,40 @@
+<!-- create_slider.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Create Slider</title>
+</head>
+<body>
+    <h1>Create Slider</h1>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Create Slider</button>
+    </form>
+
+    <h1>Slider Created Successfully!</h1>
+    <a href="/slider_create"> CREate slider</a>
+
+    <div class="row">
+        <div class="col-md-3">
+                {% for slider in sliders %}
+                <div class="card">
+
+                    <h2>{{ slider.title }}</h2>
+                    <img src="{{ slider.image.url }}" alt="{{ slider.title }}" style="max-width: 100%; height: auto;">
+                    <p>{{ slider.description }}</p>
+                </div>
+                {% endfor %}
+            
+            </div>
+        </div>
+
+    </div>
+    <!-- Display any additional content or links here -->
+</body>
+</html>
+</body>
+
+</html>

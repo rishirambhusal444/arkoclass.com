@@ -1,0 +1,128 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<head>
+    {% load static %}
+    <!-- Load local CSS first to ensure it takes precedence -->
+    <link rel="stylesheet" href="{% static 'userprofile/styles.css' %}">
+    <script src="{% static 'userprofile/script.js' %}"></script>
+
+</head>
+
+
+<div class="container mt-4">
+    <div class="row mb-3">
+        <div class="col-12">
+            <div class="card h-100">
+                <div class="d-flex justify-content-between align-items-center p-3">
+                    <div>Hello student, enhance your knowledge with us</div>
+                    <button type="button" id="becomeTeacherButton" class="btn btn-secondary">Become a teacher?</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Teacher Profile Form Card -->
+    <div id="teacherFormCard" class="card">
+        <div class="card-header">
+            <h5>Form for become teacher</h5>
+        </div>
+        <form method="post" enctype="multipart/form-data" action="{% url 'create_teacher_profile' %}">
+            {% csrf_token %}
+            <div class="row ">
+                <div class="col-6">
+                    <label for="profile_img" class="image-container" id="profileImageContainer">
+                        <img id="profileImagePreview" alt="Profile Image Preview">
+                        <i class="fas fa-camera"></i>
+                        <input type="file" class="file-input" id="profile_img" name="profile_img" accept="image/*" required>
+                    </label>
+                    <div class="text-center fw-bold">profile image</div>
+                </div>
+                <div class="col-6">
+                    <label for="cover_image" class="image-container" id="coverImageContainer">
+                        <img id="coverImagePreview" alt="Cover Image Preview">
+                        <i class="fas fa-camera"></i>
+                        <input type="file" class="file-input" id="cover_image" name="cover_image" accept="image/*" required>
+                    </label>
+                    <div class="text-center fw-bold">cover image</div>
+                </div>
+            </div>
+
+            <br>
+            <div class="row ">
+                <div class="col-3">
+                    <label for="major_subject">Major Subject</label>
+                </div>
+                <div class="col-9">
+                    <input type="text" class="form-control" id="major_subject" name="major_subject" required>
+                </div>
+            </div>
+            <div class="row bg-light">
+                <div class="col-3 d-flex align-items-center justify-content-center">
+                    <div class="text-center">About You:</div>
+                </div>
+                <div class="col-9">
+                    <textarea name="description" id="description" name="description" style="width: 100%;" required></textarea>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="btn-container mb-3">
+                    <button type="button" id="cancle_form" class=" btn btn-danger">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Request</button>
+                </div>
+            </div>
+            
+        </form>
+    </div>
+
+    <div class="row mb-3">
+        <div class="col-12">
+            <div class="card bg-light text-dark" style="height: 100px; display: flex; flex-direction: column; justify-content: space-between;">
+                <div class="d-flex justify-content-center">
+                    <div class="p-1 h2">You did not subscribe to any videos?</div>
+                </div>
+                <div class="bg-warning text-center text-dark p-2 h6">
+                    <a href="report"><div>I have purchased a video... !? Click here for report issues</div></a>                    
+                </div>
+            </div>
+        </div>
+    </div>
+<br>
+    {% for item in faculty_level_subjects %}
+        <div class="row mb-3">
+            <div class="col-12 button-group">
+                <a href="{% url 'view_teacher_profile' item.teacher.id %}" style="color:#ffffff; text-decoration:none; width:100%;">     
+                <button type="button" class="btn btn-secondary">
+                    {{ item.faculty.faculty_name }} /
+                    {{ item.level.level_name }} /
+                    {{ item.subject.subject_name }}/
+                    {{ item.teacher.id }}/
+                </button>
+                </a>
+                <a href="{% url 'vip_section:vip_form' item.subject.id %}" style="color:#ffffff; text-decoration:none; width:100%;">     
+                    <button type="button" class="btn btn-success">Buy</button>
+                </a>
+               <span> <i class="fas fa-eye"></i> 1000</span>                              
+            </div>
+        </div>
+
+        <div class="row mb-4">
+            {% for video in item.videos %}
+            <div class="col-sm-6 col-md-4 col-lg-3 mb-3">
+                <a href="{% url 'video_player' video.id %}" class="card h-100">
+                    <div class="thumbnil_container">
+                        <i class="fas fa-play thumbnil_paly"></i>
+                        <img src="{{ video.thumbnil.url }}" alt="Profile Image" class="img-fluid">
+                    </div>
+                    <div class="card-footer h-100">
+                        <p><b>{{ video.video_name }}</b> {{ video.description }}</p>
+                    </div>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    {% endfor %}
+</div>
+{% endblock %}

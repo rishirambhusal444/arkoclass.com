@@ -1,0 +1,183 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<head>
+    {% load static %}
+    <!-- Load local CSS first to ensure it takes precedence -->
+    <link rel="stylesheet" href="{% static 'userprofile/styles.css' %}">
+    <script src="{% static 'userprofile/script.js' %}"></script>
+
+</head>
+<body id="body">
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="photo">
+                <div class="cover-photo">
+                    {% if teacher.cover_image %}
+                        <img src="{{ teacher.cover_image.url }}" alt="Cover Image" class="img-fluid cover-image">
+                    {% else %}
+                        <p>No cover image available</p>
+                    {% endif %}
+                </div>
+                <div class="profile-photo">
+                    {% if teacher.profile_img %}
+                        <img src="{{ teacher.profile_img.url }}" alt="Profile Image" class="img-fluid">
+                    {% else %}
+                        <p>No profile image available</p>
+                    {% endif %}
+                </div>
+                <div type="button" class="heart"><a href="#"><i class="fas fa-heart"></i></a></div>
+                <div class="username">
+                    <a href="#">{{ teacher.user.first_name }} {{ teacher.user.last_name }}</a> || {{ teacher.major_subject }} || {{ teacher.description }}
+                </div>
+            </div>
+        </div>
+  
+        <div class="col-12">
+            <div class="profile-footer align-items-center">
+              <div class="flex-wrap bton" style="display: flex;">
+                <!-- <button type="button" class="p_btn"><a href="User_about">Your vip videos</a></button> -->
+                <a href="/videos/create_video "><button type="button" class="p_btn">Upload Video</button></a>
+                <button type="button" class=" p_btn"><a href="User_about">VIP*</a></button>
+                <button type="button" id="EditTeacherButton" class="btn btn-secondary"><i class="fas  fa-user"></i> <i class="fas fa-edit"></i></button>
+
+            </div>
+          </div>
+       </div> 
+  
+    </div> 
+
+    <div class="row">
+        <!-- this is for edit menu -->
+        <div id="EditteacherFormCard" class="card">
+            <div class="card-header">
+                <h5>Form for become teacher</h5>
+            </div>
+            
+            <form method="post" enctype="multipart/form-data" action="{% url 'edit_teacher_profile' %}">
+                {% csrf_token %}
+                <div class="row ">
+                    <div class="col-6">
+                        <div class="card">
+                        <label for="profile_img" class="image-container-edit" id="profileImageContainer">
+                            <!-- Display the current profile image -->
+                            <img id="profileImagePreview" src="{{teacher.profile_img.url }}" alt="Profile Image Preview">
+                            <i class=" fas fa-camera"></i>
+                            <input type="file" class="file-input" id="profile_img" name="profile_img" accept="image/*" >
+                        </label>
+                        </div>
+                        <div class="text-center fw-bold">profile image</div>
+                    </div>
+                    <div class="col-6">
+                        <div class="card">
+                            <label for="cover_image" class="image-container-edit" id="coverImageContainer">
+                                <img id="coverImagePreview" src="{{teacher.profile_img.url }}" alt="Profile Image Preview">
+                                <i class="fas fa-camera"></i>
+                                <input type="file" class="file-input" id="cover_image" name="cover_image"value="{{teacher.profile_img.url}}" accept="image/*" >
+                            </label>
+    
+                        </div>
+                        <div class="text-center fw-bold">cover image</div>
+                    </div>
+                </div>
+    
+                <br>
+                <div class="row  bg-light">
+                    <div class="col-6">
+                        <label for="first_name">first name</label>
+                        <input type="text" class="form-control" id="first_name" name="first_name" value="{{ teacher.user.first_name }}" >
+                    </div>         
+                    <div class="col-6">
+                        <label for="last_name">last name</label>
+                        <input type="text" class="form-control" id="last_name" name="last_name" value="{{ teacher.user.last_name }}" >
+                    </div>
+                </div>
+
+            
+                <div class="row  bg-light">
+                    <div class="col-6">
+                        <label for="phone">phone no</label>
+                        <input type="text" class="form-control" id="phone" name="phone" value="{{ teacher.user.phone }}" >
+                    </div>         
+                    <div class="col-6">
+                        <label for="last_name">major subject</label>
+                        <input type="text" class="form-control" id="major_subject" name="major_subject" value="{{ teacher.major_subject }}" >
+                    </div>
+                </div>
+            
+        
+                <div class="row">
+                    <div class="col-12">
+                        <label for="phone">about yourself</label>
+                        <textarea id=" description " name="description" style="width: 100%;"  > {{ teacher.description }}</textarea>
+                     </div>
+                </div>
+                
+                
+                <div class="row">
+                    <div class="btn-container mb-3">
+                        <button type="button" id="cancle_form" class=" btn btn-danger">Cancel</button>
+                        <button type="submit" class="btn btn-primary">save</button>
+                    </div>
+                </div>
+                
+            </form>
+        </div>
+       </div>
+
+    <div class="row mt-5">
+        <h4 class="btn btn-danger"> videos of <b>{{ teacher.user.first_name }} {{ teacher.user.last_name }}</b> list displayed below</h4>
+    </div>
+    <hr>
+ {% if messages %}
+ {% for message in messages %}
+     <div class="alert alert-{{ message.tags }}">
+         {{ message }}
+     </div>
+ {% endfor %}
+{% endif %}
+
+<hr>
+  {% for subject, videos in videos_by_subject.items %}
+    <div class="row mb-3">
+      <div class="col-12">
+        <button type="button" class="btn btn-secondary">
+            {{ subject.faculty.faculty_name }} / {{ subject.level.level_name }} / {{ subject.subject_name }}
+        </button>
+        {{user.id}}
+        {% if 1 != user.id %}
+        <a href="{% url 'vip_section:vip_form' subject.id %}" style="color:#ffffff; text-decoration:none; width:100%;">     
+            <button type="button" class="btn btn-success">Buy</button>
+        </a>
+        {% endif %}
+        <span><i class="fas fa-eye"></i> 1000</span>
+        <span><i class="fas fa-eye"></i> 1000</span>
+      </div>
+    </div>
+    <div class="row mb-4">
+        <div class="horizontal-scroll-container d-flex flex-nowrap overflow-auto">
+            {% for video in videos %}
+            <div class="col-sm-6 col-md-4 col-lg-3 mb-3 flex-shrink-0 p-2">
+                <a href="{% url 'video_player' video.id %}" class="card h-100">
+                    <div class="thumbnil_container">
+                        <i class="fas fa-play thumbnil_paly"></i>
+                        <img src="{{ video.thumbnil.url }}" alt="Profile Image" class="img-fluid">
+                    </div>
+                    <div class="card-footer h-100">
+                        <p><b>{{ video.video_name }}</b> {{ video.description }}</p>
+                    </div>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+  {% endfor %}
+    <!-- The Modal -->
+ 
+   
+    <!-- JavaScript -->
+  
+</body>
+</html>
+{% endblock %}

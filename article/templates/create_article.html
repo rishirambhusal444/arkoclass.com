@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<head>
+    {% load static %}
+    <!-- Load local CSS first to ensure it takes precedence -->
+    <link rel="stylesheet" href="{% static 'article/styles.css' %}">
+    <script src="{% static 'article/script.js' %}"></script>
+</head>
+<body>
+    <form action="{% url 'create_article' %}" method="POST" enctype="multipart/form-data" id="article-form" onsubmit="return handleFormSubmission(event)">
+        {% csrf_token %}
+        <div class="row justify-content-center mt-3">
+            <div class="col-md-12">
+                <input type="text" name="title" id="title" class="form-control" placeholder="Title" onkeydown="handleKeyDown(event, 'title')">
+            </div>
+            <div class="col-md-12">
+                <div class="position-relative toolbar-container" id="tools">
+                    <div class="button-group">
+                        <button type="button" onclick="formatText('bold')"><b>Bold</b></button>
+                        <button type="button" onclick="formatText('italic')"><i>Italic</i></button>
+                        <button type="button" onclick="toggleHighlight()"><i class="fas fa-highlighter"></i></button>
+                    </div>
+                    <div class="button-group">
+                        <button type="button" onclick="formatText('justifyLeft')" title="Align text to the left"><i class="fas fa-align-left"></i></button>
+                        <button type="button" onclick="formatText('justifyCenter')" title="Align text to the center"><i class="fas fa-align-center"></i></button>
+                        <button type="button" onclick="formatText('justifyRight')" title="Align text to the right"><i class="fas fa-align-right"></i></button>
+                    </div>
+                    <div class="button-group">
+                        <button type="button" onclick="increaseFontSize()">A+</button>
+                        <button type="button" onclick="decreaseFontSize()">A-</button>
+                    </div>
+                    <div class="button-group">
+                        <button type="button" id="image-upload-button" onclick="triggerImageUpload()">
+                            <i class="fas fa-image"></i>
+                        </button>
+                        <input type="file" name="image" id="article-image-input" accept="image/*" style="display: none;" onchange="handleImageUpload(event)">
+                    </div>
+                    <div class="button-group">
+                        <button type="button" onclick="createHyperlink()"><i class="fas fa-link"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="editor" class="editor" contenteditable="true" placeholder="Type here..." onfocus="showToolbar()" onblur="hideToolbar()"></div>
+        <input type="hidden" name="content" id="hiddenBody">
+        <div>
+            <textarea name="summary" id="summary" class="summary form-control" placeholder="Write your summary" rows="4" style="resize: none;"></textarea>
+        </div>
+        <div>
+            <button type="submit" id="submit" class="submit btn btn-primary">SUBMIT</button>
+        </div>
+    </form>
+{% endblock %}
+</body>
+</html>
+<script>
+  function applyLink() {
+    const linkName = prompt('Enter the link name:');
+    const linkUrl = prompt('Enter the link URL:');
+    
+    if (linkName && linkUrl) {
+        // Generate the complete link
+        const generatedLink = `<a href="${linkUrl}" target="_blank">${linkName}</a>`;
+        
+        // Show the generated link in an alert box
+        alert(`Generated link:\n\n${generatedLink}`);
+    } else {
+        alert('Both link name and URL are required.');
+    }
+}
+
+</script>

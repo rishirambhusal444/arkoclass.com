@@ -1,0 +1,315 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<head>
+    {% load static %}
+    <!-- Load local CSS first to ensure it takes precedence -->
+    <link rel="stylesheet" href="{% static 'videos/styles.css' %}">
+    <script src="{% static 'videos/script.js' %}"></script>
+
+</head>
+<body>            
+        <div class="row mt-4">
+            <!-- Video Player Section -->
+            <div class="col-lg-8 ">
+                <div class="row">
+                 <div class="col-12 w-100">
+                    {% if teacher_user.id == user.id %}      
+                        <button id="edit_video_btn" class="btn border border-dark" style="position: relative; background-color: #555; color:white; font-size: 18px; float: right; " onclick="toggleEditForm()"><i  class="fas fa-edit"></i></button> 
+                    {% endif %}
+                 </div>
+            </div>
+<!-- row of video container/ edit video and  footer -->
+                <div class="row"> 
+                    <div class="col-12">             
+                        <div class="container bg-dark"> <!--this is for edit form -->
+                            <div id="edit_form" style="display: none; margin-top: 30px;" class="p-4">
+                                <form action="{% url 'edit_video' video.id %}" method="post" enctype="multipart/form-data">
+                                    {% csrf_token %}
+                                    <div class="input-group mb-3">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text btn-outline-secondary" id="basic-addon3">Chapter Number</span>
+                                        </div>
+                                        <input type="text" class="form-control btn-outline-primary" name="chapter_number" value="{{ video.chapter_number }}" aria-describedby="basic-addon3">
+                                    </div>
+                                    <div class="input-group mb-3">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text btn-outline-secondary" id="basic-addon3">Video Name</span>
+                                        </div>
+                                        <input type="text" class="form-control btn-outline-primary" name="video_name" value="{{ video.video_name }}" aria-describedby="basic-addon3">
+                                    </div>
+                                
+                                    <div class="input-group mb-3">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text btn-outline-secondary" id="basic-addon3">Discription</span>
+                                        </div>
+                                        <input type="text" class="form-control btn-outline-primary" name="description" value="{{ video.description }}" aria-describedby="basic-addon3">
+                                    </div>                                                               
+                                <div class="row">
+                                    <div class="col-6">
+                                        <div class="image_required">
+                                            <label for="thumbnil" class="image-container" id="profileImageContainer">
+                                                <img id="thumbnil_preview" src="{{ video.thumbnil.url }}" alt="Profile Image Preview" class="img-fluid">
+                                                <i class="fas fa-camera" id="fa-camera"></i>
+                                                <input type="file" class="file-input" id="thumbnil" name="thumbnil" accept="image/*">
+                                            </label>
+                                            <div class="hidden-center fw-bold">Change Thumbnail</div>
+                                        </div>
+                                    </div>                         
+                                    <div class="col-6">
+                                        <div class="input-group mb-3 bg-light">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text bg-danger" id="basic-addon3">Delete Video</span>
+                                            </div>
+                                            <input type="checkbox" name="delete_video" id="delete_video" style="width: 30px; margin-left: 20px;" onclick="toggleDeleteWarning()">
+                                        </div>
+                                        <!-- Warning Message -->
+                                        <div id="delete_warning" class="alert alert-warning" style="display: none;">
+                                            Are you sure you want to delete this video?
+                                        </div>
+                            
+                                        <div class="mb-0">
+                                           
+                                            <button type="submit" class="btn btn-primary">Update</button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </form>
+                                
+                            </div> 
+                        </div>
+                        <div class="video-container " id="video-container">                       
+                            <!-- edit form ending-->
+                            <video  id="video-player" class=" border border-dark">
+                                <source  src="{{ video.video.url }}" type="video/mp4" >
+                                Your browser does not support the video tag.
+                            </video>
+                            <div class="controls" id="controls">
+                                <!-- Progress Bar with Time -->
+                                <div class="progress-bar-container">
+                                    <div class="time" id="current-time">0:00</div>
+                                    <div class="progress-bar" id="progress-bar">
+                                        <div class="progress" id="progress"></div>
+                                    </div>
+                                    <div class="time" id="total-time">0:00</div>
+                                </div>
+
+                                <!-- Button Group -->
+                                <div class="button-group">
+                                    <!-- Left Buttons -->
+                                    <div class="left-buttons">
+                                        <!-- Play/Pause Button -->
+                                        <button id="play-pause" title="Play/Pause">
+                                            <i class="fas fa-play"></i>
+                                        </button>
+                                        <!-- Forward Button -->
+                                        <button id="forward" title="Forward 10 seconds">
+                                            <i class="fas fa-forward"></i>
+                                        </button>
+                                    </div>
+
+                                    <!-- Right Buttons -->
+                                    <div class="right-buttons">
+                                        <!-- Sound Button -->
+                                        <button id="sound" title="Sound">
+                                            <i class="fas fa-volume-up"></i>
+                                        </button>
+                                        <!-- Fullscreen Button -->
+                                        <button id="full-screen" title="Fullscreen">
+                                            <i class="fas fa-expand"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>                       
+                        <div class="card-body">
+                            <h5 class="card-title">{{ video.video_name }}</h5>
+                            <p class="card-text">{{ video.description }}</p>
+                    
+                    
+                        </div>
+                        <div class="card-footer">
+                            <div class="row w-100 footer-info">
+                                <div class="col-md-4 like-views">
+                                    <div class="btn-group" role="group" aria-label="Like and Views">
+                                        <div class="btn">
+                                            <i class="fas fa-thumbs-up"></i> {{ video.likes }}:2000
+                                        </div>
+                                        <div class="btn">
+                                            <i class="fas fa-eye"></i> {{ video.views }}:2000
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-8">
+                                    <div class="comment-section ">
+                                        <button class="w-100 btn btn-outline-dark" id="comment-toggle">Show Comments</button>
+                                        <!-- Comments section -->
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <div class="comment-list w-100" id="comment-list">
+                                        <!-- Example comments -->
+                                        <div class="comment-item">Comment 1vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv: This is an amazing video!</div>
+                                        <div class="comment-item">Comment 1vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv: This is an amazing video!</div>
+                                        <div class="comment-item">Comment 1vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv: This is an amazing video!</div>
+                                        <div class="comment-item">Comment 1vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv: This is an amazing video!</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>  
+                </div>         
+                   <!-- video player section ended -->
+            </div>
+
+            <div class="col-lg-4 card "style="height: 400px; position: relative; background-image: url('/media/advertisement/offer.png'); background-size:cover;">
+                <!-- Countdown timer -->
+                <div style="position: absolute; top: 15%; right:9%; color: rgb(1, 0, 0);">
+                   <b>
+                    <span id="days" style="font-size: 20px;">00</span> days
+                    <span id="hours" style="font-size: 20px;">00</span> hr
+                   </b>     
+                </div>
+            
+                <!-- Discount text inside a star design -->
+                <div style="position: absolute; top: 43%; left: 25px; color: blue; font-size: 30px;">
+                    <b> {{discount_percentage}}%</b>
+                 </div>
+
+                 <div style="position: absolute; top: 33%; right:0% ; height: 67%; width: 46%; color: blue; font-size: 30px; background-image: url('/media/advertisement/Designer.jpeg'); background-size:cover; ">
+                 </div>
+            
+                <!-- Subject name, teacher name, and final price -->
+                <div style="position: absolute; bottom: 0%; height:20%; width: 54%; left: 0%; color: rgb(97, 81, 246); background-color: rgba(72, 228, 145, 0.937);">
+                    
+                    <div class="mx-2"><strong>
+                    <h4> {{subject.subject_name}}</h4> 
+                    <h4>
+                        <span>price = {{subject.price }}</span>
+                        <span>:: {{final_price }}</span>
+                    </h4>
+                    {% if teacher_user.id != user.id %}
+                    <a href="{% url 'vip_section:vip_form' subject.id %}" class="btn btn-secondary" style="margin-left: 50%;">  Buy Now</a>
+                    {% endif %}
+                </strong>
+                </div>
+                </div>
+
+                <div style="position: absolute; bottom: 0%; width: 46%; height:20%; right: 0%; color: rgb(255, 255, 255); background-color: rgba(72, 228, 145, 0.437); ">
+                    <h4> <strong>{{teacher_user.first_name}}{{teacher_user.last_name}}</strong></h4>
+                </strong>
+                </div>
+                </div>
+            </div>
+        </div>
+<hr>
+            <div class="row "> 
+                <div class="col-lg-12">
+                    <button  class="btn btn-secondary">
+                        {{faculty.faculty_name}} /
+                        {{level.level_name}} /
+                        {{subject.subject_name}}  
+                    </button>
+                    {% if teacher_user.id != user.id %}
+                    <a href="{% url 'vip_section:vip_form' subject.id %}" style="color:#ffffff; text-decoration:none; width:100%;">     
+                        <button type="button" class="btn btn-success">Buy</button>
+                    </a>
+                    {% else %}
+                        <button id="edit_subject_btn" class="btn btn-outline-secondary" style=" position: relative; " onclick="toggleEditForm_subject()">Edit Subject</button> 
+
+                    </a>
+                    {% endif%}
+                </div>
+            </div>
+
+            <div class="row"> 
+            <!-- this is for edit subject details -->
+                <div class="col-1"></div>
+                <div class="col-10">
+                        <div id="edit_form_subject" style=" margin-top: 10px; display: none;" class="p-5 bg-secondary">
+                            <form action="{% url 'edit_subject' subject.id %}" method="post" enctype="multipart/form-data">
+                                {% csrf_token %}
+                                <div class="row">
+                                    <div class="col-6">
+                                        <div class="input-group mb-3">
+                                            <div class="input-group-prepend w-25">
+                                                <span class="input-group-text btn-outline-secondary" id="basic-addon3">Faculty Name</span>
+                                            </div>
+                                            <input type="text" class="form-control btn-outline-primary" name="faculty_name" value="{{ faculty.faculty_name }}" aria-describedby="basic-addon3">
+                                        </div>
+                                        <div class="input-group mb-3">
+                                            <div class="input-group-prepend w-25">
+                                                <span class="input-group-text btn-outline-secondary" id="basic-addon3">Class Name</span>
+                                            </div>
+                                            <input type="text" class="form-control btn-outline-primary" name="level_name" value="{{ level.level_name }}" aria-describedby="basic-addon3">
+                                        </div>                       
+                                        <div class="input-group mb-3">
+                                            <div class="input-group-prepend w-25">
+                                                <span class="input-group-text btn-outline-secondary" id="basic-addon3">Subject Name</span>
+                                            </div>
+                                            <input type="text" class="form-control btn-outline-primary" name="subject_name" value="{{ subject.subject_name }}" aria-describedby="basic-addon3">
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="input-group mb-3">
+                                            <div class="input-group-prepend w-25">
+                                                <span class="input-group-text btn-outline-secondary" id="basic-addon3">New Price</span>
+                                            </div>
+                                            <input type="text" class="form-control btn-outline-primary" name="price" value="{{ subject.price }}" aria-describedby="basic-addon3">
+                                        </div>
+                                        <div class="input-group mb-3">
+                                            <div class="input-group-prepend w-25">
+                                                <span class="input-group-text btn-outline-secondary" id="basic-addon3">Discount</span>
+                                            </div>
+                                            <input type="text" class="form-control btn-outline-primary" name="discount" value="{{ subject.discount }}" aria-describedby="basic-addon3">
+                                        </div>                       
+                                        <div class="input-group mb-3">
+                                            <div class="input-group-prepend w-25">
+                                                <span class="input-group-text btn-outline-secondary" id="basic-addon3">Offer Time</span>
+                                            </div>
+                                            <input type="text" class="form-control btn-outline-primary" name="offer_time" value="{{ subject.offer_time }}" aria-describedby="basic-addon3">
+                                        </div>
+                                    </div>
+                                </div>
+                            
+                                <div class="mb-0 w-100">
+                                    <button type="button" id="cancle_edit_subject" class=" btn btn-danger">Cancel</button>
+                                    <button type="submit" class="btn btn-primary" style="float: right;">Update</button>
+                                </div>                                                               
+                            </form>
+                        </div>
+                </div> 
+            </div>
+
+
+            </div>
+
+
+                <!-- Example related videos -->   
+        
+            <div class="row mb-4 horizontal-scroll-container d-flex flex-nowrap overflow-auto">
+                {% for related_video in related_videos %}
+                <div class="col-sm-6 col-md-4 col-lg-3 flex-shrink-0 p-2">
+                    <a href="{% url 'video_player' related_video.id %}">
+                        <div class="card related_video">
+                            <div class="related_thu mbnil_container">
+                                <i class="fas fa-play related_thumbnil_paly"></i>
+                                <img src="{{ related_video.thumbnil.url }}" alt="Profile Image" class="img-fluid">
+                            </div>
+                            <div class="card-body bg-light" style="  line-height: 1.4; height:100px; overflow: hidden;">
+                            <p style="margin-top:-10px;"><b>{{ related_video.video_name }}</b> {{ related_video.description }}</p>
+                            </div>
+                            </div>
+                      </a>
+                </div>
+                {% endfor %}
+            </div>
+         </div> 
+          
+          
+
+</body>
+</html>
+{% endblock %}

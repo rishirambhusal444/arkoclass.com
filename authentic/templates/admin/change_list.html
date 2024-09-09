@@ -1,0 +1,10 @@
+{% extends "admin/change_list.html" %}
+{% block content %}
+{{ block.super }}
+<button id="mark-teacher">Mark Selected as Teacher</button>
+<script>
+    document.getElementById('mark-teacher').addEventListener('click', function() {
+        // Implement JavaScript code to trigger admin action
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,131 @@
+    
+
+body {
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100%;
+  overflow: auto;
+}
+.editor-container {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+
+.toolbar-container {
+position: relative; /* Ensures the toolbar is positioned relative to this container */
+display: flex;
+background-color: rgba(133, 24, 210, 0.9);
+}
+
+.tools {
+/* this is for B/I/H button */
+display: none;
+flex-direction: column; /* Arranges buttons in a column */
+align-items: center;
+background-color: rgba(248, 249, 250, 0.9);
+padding: 10px;
+border: 1px solid #ccc;
+border-radius: 5px;
+position: absolute; /* Positioned absolutely within the container */
+top: 10px; /* Adjust to position vertically */
+right: 13px; /* Adjust to position horizontally */
+z-index: 1000; /* Ensures it appears above other content */
+}
+
+.toolbar button,
+.toolbar input[type="file"] {
+margin: 5px 1px;
+padding: 3px 10px;
+font-size: 16px;
+width: 40px;
+}
+
+
+.editor {
+  width: 100%;
+  height: auto;
+  min-height: 350px;
+  max-height: 450px;
+  border: 1px solid #ccc;
+  padding: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  background-color: #fff;
+  overflow-y: auto;
+}
+.text-format-buttons {
+  display: flex;
+  margin: 0;
+  padding: 0;
+}
+.button-group {
+  display: inline;
+  font-size: 18px;
+  padding: 0%;
+
+}
+
+.container{
+  padding-top: 40px;
+  border: 1px solid #170ceb;
+}
+
+.summary {   
+  height: 60px;
+  opacity: 9;
+  color: rgba(2, 3, 56, 0.845);
+}
+.submit {
+  float: right;   
+  background-color: #007bff;
+  color: #fff;  
+  padding: 5px 10px;
+  border: none;
+  border-radius: 5px;
+}
+.card-container {
+  width: 100%;
+  max-height: 100%;
+  border: 1px solid #8581fb;
+  padding: 2px;
+  margin-top: 4px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  background-color: #eeedf2;
+  font-family: 'Times New Roman', Times, serif;
+}
+.summary_text {     
+  height: 50px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: rgba(20, 26, 150, 0.845);
+  line-height: 100%;
+  font-size: 12px;
+}
+.articke_list_summary {
+  height: 100%;
+  background-color: #b3b1de;
+  border: 1px solid #170ceb;
+
+}
+.article_list_title {
+  color: rgba(53, 60, 191, 0.845);
+  font-weight: 600;
+  font-size: 16px;
+}
+.title{
+font-size: 24px;
+}
+
+#article-image-input {
+  display: none;
+}
+.error-border {
+          border: 2px solid red;
+}

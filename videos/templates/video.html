@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js" integrity="sha384-oBqDVmMz4fnFO9gybBogGzK35sI5ID1GTXA/1E0F5ZgpztSnNr5O6mzOa0ck0yFi" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
+
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
+
+    <style>
+        .inline-group {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .inline-group input.form-control {
+            margin-right: 10px;
+            width: auto;
+            flex-grow: 1;
+            display: inline-block;
+        }
+        .inline-group button {
+            display: inline-block;
+        }
+        .border-style {
+            border: 1px solid hsl(0, 6%, 10%);
+        }
+        ::placeholder {
+            font-family: Arial, sans-serif;
+            font-size: 18px;
+            font-weight: bolder;
+        }
+        #video-preview video {
+            width: 100%;
+            height: auto;
+        }
+        #video-preview {
+            position: relative;
+        }
+        #cancel-button {
+            position: absolute;
+            top: 0px;
+            right: 0px;
+        }
+        .select-center {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <form method="post" action="{% url 'video' %}" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="input-group mb-3 border-style">
+                        <input type="text" id="chapter-number" name="chapter_number" class="form-control" placeholder="Chapter number" required>
+                        <input type="text" id="video-name" name="video_name" class="form-control" placeholder="Write video name" required>
+                    </div>
+                </div>
+        
+                <div class="col-md-4">
+                    <div class="input-group video-upload mb-3">
+                        <button type="button" id="video-upload-button" class="btn btn-dark" style="width:100%;">
+                            <span style="margin-right:5%;">Insert Video</span> <i class="fas fa-video"></i>
+                        </button>
+                        <input type="file" class="custom-file-input" id="video-upload" name="video" accept="video/*" style="display: none;" required>
+                    </div>
+                    <div id="video-preview" class="mt-2"></div>
+                </div>
+        
+                <div class="col-md-4">
+                    <div class="input-group mb-3 border-style">
+                        <textarea name="description" id="description" class="form-control" placeholder="Write about video #math, #physics" rows="3" style="resize: none;" required></textarea>
+                    </div>
+                </div>
+            </div>
+           
+            <div class="form-group row">
+                <div class="col-md-12">
+                    <button type="submit" class="btn btn-primary" style="float: right;">Submit</button>
+                </div>
+            </div>
+        </form>
+        
+        <hr>
+
+        <!-- Video List -->
+        <h2 class="mt-5">Video List</h2>
+        <table class="table table-striped mt-3">
+            <thead>
+            <tr>
+                <th>#</th>
+                <th>Faculty</th>
+                <th>Level</th>
+                <th>Subject</th>
+                <th>Chapter Number</th>
+                <th>Video Name</th>
+                <th>Description</th>
+                <th>Video File</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for video in videos %}
+                <tr>
+                    <td>{{ video.id }}</td>
+                    <td>{{ video.faculty.faculty_name }}</td>
+                    <td>{{ video.level.level_name }}</td>
+                    <td>{{ video.subject.subject_name }}</td>
+                    <td>{{ video.chapter_number }}</td>
+                    <td>{{ video.video_name }}</td>
+                    <td>{{ video.description }}</td>
+                    <td><a href="{{ video.video.url }}">Download</a></td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const videoUploadInput = document.getElementById("video-upload");
+            const videoUploadButton = document.getElementById("video-upload-button");
+            const videoPreviewDiv = document.getElementById("video-preview");
+
+            videoUploadButton.addEventListener("click", function() {
+                videoUploadInput.click();
+            });
+
+            videoUploadInput.addEventListener("change", function() {
+                const file = videoUploadInput.files[0];
+                if (file) {
+                    videoUploadButton.style.display = 'none'; // Hide the upload button
+                    const video = document.createElement("video");
+                    video.src = URL.createObjectURL(file);
+                    video.controls = true; // Show video controls
+                    video.classList.add("w-100");
+
+                    const cancelButton = document.createElement("button");
+                    cancelButton.id = "cancel-button";
+                    cancelButton.className = "btn btn-danger";
+                    cancelButton.innerText = "Cancel";
+                    cancelButton.onclick = function() {
+                        videoUploadInput.value = ''; // Clear the input value
+                        videoPreviewDiv.innerHTML = ''; // Clear the preview
+                        videoUploadButton.style.display = 'block'; // Show the upload button again
+                    };
+
+                    videoPreviewDiv.innerHTML = '';
+                    videoPreviewDiv.appendChild(video);
+                    videoPreviewDiv.appendChild(cancelButton);
+                } else {
+                    videoPreviewDiv.innerHTML = '';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

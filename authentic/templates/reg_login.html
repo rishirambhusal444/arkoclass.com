@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login or Register</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #ffffff;
+            font-family: Arial, sans-serif;
+        }
+        .card {
+            border: none;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .card-body {
+            padding: 2rem;
+        }
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        .btn-primary {
+            background-color: #1877f2;
+            border-color: #1877f2;
+        }
+        .btn-secondary {
+            background-color: #42b72a;
+            border-color: #42b72a;
+        }
+        .btn-primary:hover,
+        .btn-secondary:hover {
+            opacity: 0.9;
+        }
+        .color-red {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 mx-auto mt-5">
+                <div class="card">
+                    <div class="card-body login-card" id="login-card" style="display: {% if show_login %}block{% else %}none{% endif %};">
+                        <h2 class="text-center mb-4">Log In</h2>
+                        <form id="loginForm" method="POST" action="{% url 'login' %}">
+                            {% csrf_token %}
+                            {% if messages %}
+                                {% for message in messages %}
+                                    <div class="color-red" role="alert">
+                                        {{ message }}
+                                    </div>
+                                {% endfor %}
+                            {% endif %}
+                            <div class="form-group">
+                                <label for="username">Email</label>
+                                <input type="text" id="username" name="username" class="form-control" required>
+                                {% if login_form.username.errors %}
+                                    <div class="color-red">
+                                        {{ login_form.username.errors }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="form-group">
+                                <label for="password">Password</label>
+                                <input type="password" id="password" name="password" class="form-control" required>
+                                {% if login_form.password.errors %}
+                                    <div class="color-red">
+                                        {{ login_form.password.errors }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-block">Log In</button>
+                        </form>
+                        <div class="text-center mt-3">
+                            <button id="showRegisterBtn" class="btn btn-link">Create an Account</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card mt-4" id="registerCard" style="display: {% if show_register %}block{% else %}none{% endif %};">
+                    <div class="card-body">
+                        <h2 class="text-center mb-4">Create an Account</h2>
+                        <form id="registerForm" method="POST" action="{% url 'register' %}">
+                            {% csrf_token %}
+                            {% if messages %}
+                                {% for message in messages %}
+                                    <div class="color-red" role="alert">
+                                        {{ message }}
+                                    </div>
+                                {% endfor %}
+                            {% endif %}
+                            <div class="form-row">
+                                <div class="form-group col-md-6">
+                                    <label for="first_name">First Name</label>
+                                    <input type="text" id="first_name" name="first_name" class="form-control" required placeholder="Enter first name">
+                                    {% if register_form.first_name.errors %}
+                                        <div class="color-red">
+                                            {{ register_form.first_name.errors }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label for="last_name">Last Name</label>
+                                    <input type="text" id="last_name" name="last_name" class="form-control" required placeholder="Enter last name">
+                                    {% if register_form.last_name.errors %}
+                                        <div class="color-red">
+                                            {{ register_form.last_name.errors }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="phone">Phone</label>
+                                <input type="text" id="phone" name="phone" class="form-control" required placeholder="Enter phone number">
+                                {% if register_form.phone.errors %}
+                                    <div class="color-red">
+                                        {{ register_form.phone.errors }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="form-group">
+                                <label for="email">Email</label>
+                                <input type="email" id="email" name="email" class="form-control" required placeholder="yourmail@domain.com">
+                                {% if register_form.email.errors %}
+                                    <div class="color-red">
+                                        {{ register_form.email.errors }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="form-group">
+                                <label for="password1">Password</label>
+                                <input type="password" id="password1" name="password1" class="form-control" required placeholder="Password must include uppercase, lowercase, digits, and special characters">
+                                {% if register_form.password1.errors %}
+                                    <div class="color-red">
+                                        {{ register_form.password1.errors }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="form-group">
+                                <label for="password2">Confirm Password</label>
+                                <input type="password" id="password2" name="password2" class="form-control" required placeholder="Confirm your password">
+                                {% if register_form.password2.errors %}
+                                    <div class="color-red">
+                                        {{ register_form.password2.errors }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <button type="submit" class="btn btn-secondary btn-block">Create Account</button>
+                        </form>
+                        <div class="text-center mt-3">
+                            <button id="showLoginBtn" class="btn btn-link">Log In</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var showRegisterBtn = document.getElementById('showRegisterBtn');
+            var showLoginBtn = document.getElementById('showLoginBtn');
+            var loginCard = document.getElementById('login-card');
+            var registerCard = document.getElementById('registerCard');
+
+            if (showRegisterBtn) {
+                showRegisterBtn.addEventListener('click', function() {
+                    loginCard.style.display = 'none';
+                    registerCard.style.display = 'block';
+                });
+            }
+            if (showLoginBtn) {
+                showLoginBtn.addEventListener('click', function() {
+                    registerCard.style.display = 'none';
+                    loginCard.style.display = 'block';
+                });
+            }
+        });
+    </script>
+</body>
+</html>
